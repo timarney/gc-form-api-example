@@ -8,8 +8,8 @@ The response pipeline follows the GC Forms API and the Forms client responses pi
 
 1. Install Node.js 22 or later.
 2. Run `npm install`.
-3. Copy `.env.example` to `.env` and fill in `FORMS_PROJECT_ID` and `GOOGLE_SPREADSHEET_ID`.
-4. Put the GC Forms API key JSON and a Google service account JSON file in `credentials/`.
+3. Copy `.env.example` to `.env` and fill in `FORMS_PROJECT_ID`.
+4. Put the GC Forms API key JSON file in `credentials/`.
 5. Run `npm run typecheck`, then `npm start` for a one-time poll or `npm run watch` for continuous polling.
 
 Each submission is written as its own JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version. Answers follow the Forms client layout and group ordering; stable custom Question IDs and tags are included when configured.
@@ -47,4 +47,4 @@ This directory contains sensitive submission data. Keep it out of version contro
 
 ## Settings
 
-Use staging API and identity-provider URLs for staging forms. Keep private API key files out of source control. Google Sheets output is intentionally left out for now because connecting it requires Google credential setup.
+Use staging API and identity-provider URLs for staging forms. Keep private API key files out of source control.
