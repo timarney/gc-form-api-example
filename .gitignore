@@ -4,3 +4,4 @@ dist/
 credentials/
 output/
 *.log
+.DS_Store

@@ -54,7 +54,12 @@ export async function fetchWithRetry(
 
     const retryDelay = response ? retryAfterMs(response) : undefined;
     const exponentialDelay = Math.min(baseDelayMs * 2 ** attempt, 15_000);
-    await wait(retryDelay ?? Math.round(exponentialDelay * (0.8 + Math.random() * 0.4)));
+    const delay = retryDelay ?? Math.round(exponentialDelay * (0.8 + Math.random() * 0.4));
+    if (response?.status === 429) {
+      // `attempt` is zero-based; this message reports the upcoming retry as one-based.
+      console.warn(`Rate limit reached; retrying in ${delay}ms (attempt ${attempt + 2} of ${attempts}).`);
+    }
+    await wait(delay);
   }
   throw new Error(`Request failed after ${attempts} attempts`, { cause: lastError });
 }
