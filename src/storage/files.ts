@@ -113,7 +113,7 @@ export async function saveFormattedSubmission(
     })),
   };
   await atomicWrite(
-    path.join(outputDir, "responses", safeFileName(formId), `${safeFileName(submissionId)}.json`),
+    path.join(outputDir, "responses", safeFileName(formId), `v${formVersion}`, `${safeFileName(submissionId)}.json`),
     `${JSON.stringify(result, null, 2)}\n`,
   );
   return result;
