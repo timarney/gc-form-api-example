@@ -85,7 +85,7 @@ export class ResponsePuller {
 
     // Keep the raw receipt, attachment files, and template before any confirmation.
     await saveRawSubmission(this.config.outputDir, item.name, rawJson);
-    await saveTemplate(this.config.outputDir, item.version, template);
+    await saveTemplate(this.config.outputDir, this.apiKey.formId, item.version, template);
     const attachments = await downloadAttachments(this.config.outputDir, item.name, decrypted.attachments);
     const formatted = await saveFormattedSubmission(
       this.config.outputDir,

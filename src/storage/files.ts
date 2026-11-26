@@ -16,9 +16,14 @@ async function atomicWrite(filePath: string, data: string | Uint8Array): Promise
   await rename(tempPath, filePath);
 }
 
-export async function saveTemplate(outputDir: string, version: number, template: FormProperties): Promise<void> {
+export async function saveTemplate(
+  outputDir: string,
+  formId: string,
+  version: number,
+  template: FormProperties,
+): Promise<void> {
   await atomicWrite(
-    path.join(outputDir, "templates", `v${version}.json`),
+    path.join(outputDir, "templates", safeFileName(formId), `v${version}.json`),
     `${JSON.stringify(template, null, 2)}\n`,
   );
 }
@@ -108,7 +113,7 @@ export async function saveFormattedSubmission(
     })),
   };
   await atomicWrite(
-    path.join(outputDir, "responses", `${safeFileName(submissionId)}.json`),
+    path.join(outputDir, "responses", safeFileName(formId), `${safeFileName(submissionId)}.json`),
     `${JSON.stringify(result, null, 2)}\n`,
   );
   return result;

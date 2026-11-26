@@ -38,8 +38,8 @@ Attachment download links expire quickly, so the worker downloads attachments im
 ```text
 output/
   source/                 # Decrypted API payloads, including receipt codes
-  templates/v3.json       # Exact form template used by version 3 responses
-  responses/<name>.json   # Formatted, template-ordered answer records
+  templates/<form-id>/v3.json       # Exact form template used by version 3 responses
+  responses/<form-id>/<name>.json   # Formatted, template-ordered answer records
   attachments/<name>/     # Downloaded attachments
 ```
 
