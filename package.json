@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/main.js",
+    "csv": "node dist/csv/main.js",
     "dev": "tsx src/main.ts",
     "watch": "tsx src/main.ts --watch",
     "typecheck": "tsc --noEmit"

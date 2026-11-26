@@ -14,6 +14,16 @@ The response pipeline follows the GC Forms API and the Forms client responses pi
 
 Each submission is written as its own JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version. Answers follow the Forms client layout and group ordering.
 
+To export a form version's formatted responses to CSV, build the project and run:
+
+```sh
+npm run build
+# npm run csv -- cmwxulejz000001yif1xgqv95 1
+npm run csv -- <form-id> <version>
+```
+
+The CSV is written to `output/csv/<form-id>/v<version>.csv`.
+
 ## Background mode
 
 `npm run watch` polls every `POLL_INTERVAL_SECONDS` (minimum 10 seconds). Keep it running under your process manager of choice (for example, `systemd`, `launchd`, or a container restart policy). It handles `SIGINT` and `SIGTERM` and continues after individual response or polling failures.
