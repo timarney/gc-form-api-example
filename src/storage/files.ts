@@ -1,8 +1,9 @@
 import { mkdir, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { mapAnswers, sortByGroups } from "@gcforms/core";
 import type { FormProperties } from "@gcforms/types";
+import type { MappedAnswer } from "@gcforms/core";
 import type { Attachment, FormattedSubmission, RawAnswers, SavedAttachment } from "../types.js";
-import { mapAnswers } from "../responses/map-answers.js";
 
 function safeFileName(input: string): string {
   const leaf = path.basename(input).replace(/[\u0000-\u001f<>:"\/\\|?*]/g, "_").trim();
@@ -14,6 +15,23 @@ async function atomicWrite(filePath: string, data: string | Uint8Array): Promise
   const tempPath = `${filePath}.${process.pid}.${Date.now()}.tmp`;
   await writeFile(tempPath, data, { mode: 0o600, flag: "wx" });
   await rename(tempPath, filePath);
+}
+
+function orderAnswersByTemplate(mappedAnswers: MappedAnswer[], formTemplate: FormProperties): MappedAnswer[] {
+  const elements = Array.isArray(formTemplate.elements) ? formTemplate.elements : [];
+  const sortedElements = sortByGroups({ form: formTemplate, elements });
+  const answersByQuestionId = new Map(
+    mappedAnswers
+      .filter((answer) => answer.type !== "-")
+      .map((answer) => [answer.questionId, answer]),
+  );
+  const orderedAnswers = sortedElements.flatMap((element) => {
+    const answer = answersByQuestionId.get(element.id);
+    return answer ? [answer] : [];
+  });
+  const orderedAnswerSet = new Set(orderedAnswers);
+
+  return [...orderedAnswers, ...mappedAnswers.filter((answer) => !orderedAnswerSet.has(answer))];
 }
 
 export async function saveTemplate(outputDir: string, version: number, template: FormProperties): Promise<void> {
@@ -74,6 +92,16 @@ export async function saveFormattedSubmission(
 ): Promise<FormattedSubmission> {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) throw new Error(`Invalid createdAt for submission ${submissionId}`);
+  const attachmentMap = new Map(
+    attachments.map((attachment) => [
+      attachment.id,
+      {
+        originalName: attachment.name,
+        actualName: path.basename(attachment.savedAs),
+        isPotentiallyMalicious: attachment.isPotentiallyMalicious,
+      },
+    ]),
+  );
   const result: FormattedSubmission = {
     submissionId,
     createdAt: date.toISOString(),
@@ -81,7 +109,14 @@ export async function saveFormattedSubmission(
     formVersion,
     formTitleEn: template.titleEn,
     formTitleFr: template.titleFr,
-    answers: mapAnswers(template, rawAnswers, attachments),
+    answers: orderAnswersByTemplate(
+      mapAnswers({
+        formTemplate: template,
+        rawAnswers,
+        attachments: attachmentMap,
+      }),
+      template,
+    ),
     attachments: attachments.map(({ id, name, savedAs, isPotentiallyMalicious, md5 }) => ({
       id,
       originalName: name,

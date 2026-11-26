@@ -1,4 +1,6 @@
-import type { FormProperties, Response } from "@gcforms/types";
+import type { FormProperties } from "@gcforms/types";
+import type { MappedAnswer, RawAnswers } from "@gcforms/core";
+export type { RawAnswers } from "@gcforms/core";
 
 export interface PrivateApiKey {
   keyId: string;
@@ -42,17 +44,6 @@ export interface DecryptedSubmission {
   version?: number;
 }
 
-export interface MappedAnswer {
-  type: string;
-  questionId: number;
-  questionKey: string;
-  questionEn?: string;
-  questionFr?: string;
-  tags: string[];
-  answer: string | MappedAnswer[][];
-  dateFormat?: string;
-}
-
 export interface FormattedSubmission {
   submissionId: string;
   createdAt: string;
@@ -70,4 +61,3 @@ export interface FormattedSubmission {
   }>;
 }
 
-export type RawAnswers = Record<string, Response>;

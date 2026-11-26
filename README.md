@@ -2,7 +2,7 @@
 
 A small TypeScript worker that retrieves new GC Forms submissions, verifies and decrypts them, formats answers against the exact template version used for each submission, and saves JSON and attachment files locally.
 
-The response pipeline follows the GC Forms API and the Forms client responses pilot: RSA-OAEP-SHA256 unwraps the AES-256-GCM key material, the MD5 checksum is verified before mapping, and template element ordering follows `sortByLayout` / group ordering. The `@gcforms/types` package provides the shared template and answer types.
+The response pipeline follows the GC Forms API and the Forms client responses pilot: RSA-OAEP-SHA256 unwraps the AES-256-GCM key material, the MD5 checksum is verified before mapping, and template element ordering follows the shared `@gcforms/core` layout and response-mapping utilities. The `@gcforms/types` package provides the shared template types.
 
 ## Setup
 
@@ -12,7 +12,7 @@ The response pipeline follows the GC Forms API and the Forms client responses pi
 4. Put the GC Forms API key JSON file in `credentials/`.
 5. Run `npm run typecheck`, then `npm start` for a one-time poll or `npm run watch` for continuous polling.
 
-Each submission is written as its own JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version. Answers follow the Forms client layout and group ordering; stable custom Question IDs and tags are included when configured.
+Each submission is written as its own JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version. Answers follow the Forms client layout and group ordering.
 
 ## Background mode
 
