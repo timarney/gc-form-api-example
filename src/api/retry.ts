@@ -21,6 +21,17 @@ function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function formatDelay(ms: number): string {
+  const totalSeconds = Math.round(ms / 1000);
+  if (totalSeconds < 1) return "less than a second";
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const parts: string[] = [];
+  if (minutes > 0) parts.push(`${minutes} minute${minutes === 1 ? "" : "s"}`);
+  if (seconds > 0) parts.push(`${seconds} second${seconds === 1 ? "" : "s"}`);
+  return parts.join(" ");
+}
+
 export async function fetchWithRetry(
   input: string | URL,
   init: RequestInit,
@@ -57,7 +68,9 @@ export async function fetchWithRetry(
     const delay = retryDelay ?? Math.round(exponentialDelay * (0.8 + Math.random() * 0.4));
     if (response?.status === 429) {
       // `attempt` is zero-based; this message reports the upcoming retry as one-based.
-      console.warn(`Rate limit reached; retrying in ${delay}ms (attempt ${attempt + 2} of ${attempts}).`);
+      console.warn(
+        `Rate limit reached; waiting ${formatDelay(delay)} before retrying (attempt ${attempt + 2} of ${attempts}).`,
+      );
     }
     await wait(delay);
   }
