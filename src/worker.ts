@@ -54,11 +54,17 @@ export class ResponsePuller {
 
   public async watch(signal: AbortSignal): Promise<void> {
     while (!signal.aborted) {
+      let submissionCount = 0;
       try {
-        await this.pollOnce();
+        submissionCount = await this.pollOnce();
       } catch (error) {
         console.error("Polling failed; will try again after the configured interval.", error);
       }
+      if (submissionCount > 0) {
+        console.info(`Retrieved ${submissionCount} submission(s); polling immediately for the next batch.`);
+        continue;
+      }
+      console.info(`Waiting ${this.config.pollIntervalMs / 1000}s before the next poll.`);
       await sleep(this.config.pollIntervalMs, signal);
     }
   }
