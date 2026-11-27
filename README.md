@@ -12,17 +12,12 @@ The response pipeline follows the GC Forms API and the Forms client responses pi
 4. Put the GC Forms API key JSON file in `credentials/`.
 5. Run `npm run typecheck`, then `npm start` for a one-time poll or `npm run watch` for continuous polling.
 
-Each submission is written as its own JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version. Answers follow the Forms client layout and group ordering.
+Each submission is written as its own human-readable JSON file. The response includes its form version and is formatted using the template for that same version. Templates are saved separately by version, and answers follow the form's group ordering.
 
-To export a form version's formatted responses to CSV, build the project and run:
-
-```sh
-npm run build
-# npm run csv -- cmwxulejz000001yif1xgqv95 1
-npm run csv -- <form-id> <version>
-```
-
-The CSV is written to `output/csv/<form-id>/v<version>.csv`.
+Formatted response JSON uses bilingual labels by default. Set `RESPONSE_LOCALE=en` or
+`RESPONSE_LOCALE=fr` to write a single-language human-readable view. Repeating sets
+are represented as `rows`; the raw API payload and exact template remain available
+under `source/` and `templates/`.
 
 ## Background mode
 
@@ -41,7 +36,7 @@ View `output/worker.log` for progress. Stop the process with `kill "$(cat output
 
 By default, a submission is confirmed only after its raw source, template, attachments, and formatted JSON have been written successfully. If a step fails, the worker leaves it unconfirmed for a later poll. Set `CONFIRM_AFTER_SUCCESS=false` to retain submissions at GC Forms after export.
 
-Attachment download links expire quickly, so the worker downloads attachments immediately after decrypting a response. Files flagged as potentially malicious are saved under `attachments/potentially-malicious/` and marked in the JSON and Sheet. Do not open those files without following your organization's security process.
+Attachment download links expire quickly, so the worker downloads attachments immediately after decrypting a response. Files flagged as potentially malicious are saved under `attachments/potentially-malicious/` and marked in the JSON. Do not open those files without following your organization's security process.
 
 ## Output
 
@@ -57,4 +52,5 @@ This directory contains sensitive submission data. Keep it out of version contro
 
 ## Settings
 
+Set `RESPONSE_LOCALE` to `en`, `fr`, or `both` (the default) to control the labels in formatted response JSON.
 Use staging API and identity-provider URLs for staging forms. Keep private API key files out of source control.

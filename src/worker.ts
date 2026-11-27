@@ -102,6 +102,7 @@ export class ResponsePuller {
       template,
       rawAnswers,
       attachments,
+      this.config.responseLocale,
     );
 
     if (this.config.confirmAfterSuccess) {

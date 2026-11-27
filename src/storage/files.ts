@@ -3,6 +3,8 @@ import path from "node:path";
 import { mapAnswers, orderAnswersByTemplate } from "@gcforms/core";
 import type { FormProperties } from "@gcforms/types";
 import type { Attachment, FormattedSubmission, RawAnswers, SavedAttachment } from "../types.js";
+import { toReadableSubmission } from "../responses/readable.js";
+import type { ResponseLocale } from "../responses/readable.js";
 
 function safeFileName(input: string): string {
   const leaf = path.basename(input).replace(/[\u0000-\u001f<>:"\/\\|?*]/g, "_").trim();
@@ -76,6 +78,7 @@ export async function saveFormattedSubmission(
   template: FormProperties,
   rawAnswers: RawAnswers,
   attachments: SavedAttachment[],
+  responseLocale: ResponseLocale,
 ): Promise<FormattedSubmission> {
   const date = new Date(createdAt);
   if (Number.isNaN(date.getTime())) throw new Error(`Invalid createdAt for submission ${submissionId}`);
@@ -89,13 +92,11 @@ export async function saveFormattedSubmission(
       },
     ]),
   );
-  const result: FormattedSubmission = {
+  const mappedSubmission = {
     submissionId,
     createdAt: date.toISOString(),
     formId,
     formVersion,
-    formTitleEn: template.titleEn,
-    formTitleFr: template.titleFr,
     answers: orderAnswersByTemplate(
       mapAnswers({
         formTemplate: template,
@@ -112,6 +113,14 @@ export async function saveFormattedSubmission(
       ...(md5 ? { md5 } : {}),
     })),
   };
+  const result = toReadableSubmission(
+    {
+      ...mappedSubmission,
+      formTitleEn: template.titleEn,
+      formTitleFr: template.titleFr,
+    },
+    responseLocale,
+  );
   await atomicWrite(
     path.join(outputDir, "responses", safeFileName(formId), `v${formVersion}`, `${safeFileName(submissionId)}.json`),
     `${JSON.stringify(result, null, 2)}\n`,

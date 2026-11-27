@@ -11,6 +11,7 @@ export interface Config {
   outputDir: string;
   pollIntervalMs: number;
   confirmAfterSuccess: boolean;
+  responseLocale: "en" | "fr" | "both";
   watch: boolean;
 }
 
@@ -23,6 +24,14 @@ function requiredEnv(name: string): string {
 function parseBoolean(value: string | undefined, fallback: boolean): boolean {
   if (value === undefined || value.trim() === "") return fallback;
   return ["1", "true", "yes", "on"].includes(value.toLowerCase());
+}
+
+function parseResponseLocale(value: string | undefined): "en" | "fr" | "both" {
+  const locale = value?.trim().toLowerCase() || "both";
+  if (locale !== "en" && locale !== "fr" && locale !== "both") {
+    throw new Error("RESPONSE_LOCALE must be en, fr, or both");
+  }
+  return locale;
 }
 
 export async function loadConfig(watch: boolean): Promise<{ config: Config; apiKey: PrivateApiKey }> {
@@ -53,6 +62,7 @@ export async function loadConfig(watch: boolean): Promise<{ config: Config; apiK
       outputDir: path.resolve(process.env.OUTPUT_DIR ?? "./output"),
       pollIntervalMs: pollSeconds * 1000,
       confirmAfterSuccess: parseBoolean(process.env.CONFIRM_AFTER_SUCCESS, true),
+      responseLocale: parseResponseLocale(process.env.RESPONSE_LOCALE),
       watch,
     },
   };

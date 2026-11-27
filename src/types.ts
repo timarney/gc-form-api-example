@@ -46,13 +46,30 @@ export interface DecryptedSubmission {
 
 export interface FormattedSubmission {
   submissionId: string;
-  createdAt: string;
-  formId: string;
-  formVersion: number;
-  formTitleEn: string;
-  formTitleFr: string;
-  answers: MappedAnswer[];
-  attachments: Array<{
+  submittedAt: string;
+  form: {
+    id: string;
+    version: number;
+    title: string | {
+      en: string;
+      fr: string;
+    };
+  };
+  answers: Array<{
+    question: string | {
+      en: string;
+      fr: string;
+    };
+    answer?: string;
+    rows?: Array<Array<{
+      question: string | {
+        en: string;
+        fr: string;
+      };
+      answer?: string;
+    }>>;
+  }>;
+  attachments?: Array<{
     id: string;
     originalName: string;
     savedAs: string;
